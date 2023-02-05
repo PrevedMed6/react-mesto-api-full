@@ -1,0 +1,12 @@
+.element__title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 109% 10.6% 8.8% 7.4%;
+  box-sizing: border-box;
+  grid-row: 1;
+  grid-column: 1;
+  background-color: #fff;
+  z-index: 1;
+}

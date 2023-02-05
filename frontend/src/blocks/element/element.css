@@ -1,0 +1,8 @@
+.element {
+  list-style-type: none;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 100%;
+}

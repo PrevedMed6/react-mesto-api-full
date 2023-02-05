@@ -1,0 +1,13 @@
+.header__navigation{
+  font-style: normal;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.2;
+  color: #A9A9A9;
+  text-decoration: none;
+  transition: opacity .3s linear;
+}
+
+.header__navigation:hover{
+  opacity: .6;
+}

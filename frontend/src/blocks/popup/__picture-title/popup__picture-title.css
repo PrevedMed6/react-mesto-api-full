@@ -1,0 +1,13 @@
+.popup__picture-title {
+  margin: 10px 0 0 0;
+  font-size: 12px;
+  line-height: 1.25;
+  font-weight: 400;
+  max-width: 291px;
+}
+
+@media screen and (max-width: 468px) {
+  .popup__picture-title {
+    max-width: 240px;
+  }
+}
