@@ -2,12 +2,12 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const errorNames = require('../utils/ErrorNames');
 const errorTexts = require('../utils/ErrorTexts');
-const dotEnvConsts = require('../utils/DotEnvConsts');
 const NotFoundError = require('../utils/NotFoundError');
 const UnauthorizedError = require('../utils/UnauthorizedError');
 const BadRequestError = require('../utils/BadRequestError');
 const UserDuplicateError = require('../utils/UserDuplicateError');
 const User = require('../models/user');
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 function updateUser(userId, fields, options) {
   return User.findByIdAndUpdate(userId, fields, options).then((user) => {
@@ -133,19 +133,29 @@ module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, dotEnvConsts.SECRET_KEY);
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
       res
         .cookie('jwt', token, {
           maxAge: 3600000 * 24 * 7,
           httpOnly: true,
-          sameSite: true,
+          sameSite: 'none',
+          secure: true,
         })
         .send({
           message: 'Авторизация успешна',
         })
         .end();
     })
-    .catch(() => {
+    .catch((err) => {
       next(new UnauthorizedError());
     });
+};
+
+module.exports.logout = (req, res, next) => {
+  res
+  .clearCookie('jwt')
+  .send({
+    message: 'Вы вышли',
+  })
+  .end();
 };

@@ -5,3 +5,9 @@ node_modules
 
 # production
 build
+
+#logs
+*.log
+
+#env
+.env

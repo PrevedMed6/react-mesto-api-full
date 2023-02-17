@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React from "react";
 import Header from "./Header";
 import Main from "./Main";
@@ -41,45 +42,45 @@ function App() {
   let history = useHistory();
 
   React.useEffect(() => {
-    Promise.all([Api.getUserInfo(), Api.getInitialCards()])
-      .then(([user, initialCards]) => {
-        setCurrentUser(user);
-        setCards(initialCards);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+  if(loggedIn)
+    {
+      Promise.all([Api.getUserInfo(), Api.getInitialCards()])
+        .then(([user, initialCards]) => {
+          setCurrentUser(user.data);
+          setMyMail(user.data.email);
+          setCards(initialCards.data);
+        })
+        .catch((err) => {
+          console.log(err);
+       });
+    }
+  },[history, loggedIn]);
 
   React.useEffect(() => {
     const сheckToken = () => {
-      const jwt = localStorage.getItem("jwt");
-      if (jwt) {
-        Auth.getMe(jwt)
-          .then((res) => {
-            if (res?.data?.email) {
-              setMyMail(res.data.email);
-              setLoggedIn(true);
-              history.push("/");
-            } else {
-              logOut();
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      }
-    };
-
+      Auth.getMe()
+        .then((res) => {
+          if (res?.data?.email) {
+            setMyMail(res.data.email);
+            setLoggedIn(true);
+            history.push("/");
+          } else {
+            setLoggedIn(false);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      };
     сheckToken();
   }, [history]);
 
   function handleCardLike(card) {
-    const isLiked = card.likes.some((i) => i._id === currentUser._id);
+    const isLiked = card.likes.some((i) => i === currentUser._id);
     Api.toggleLikes(card._id, !isLiked)
       .then((newCard) => {
         setCards((state) =>
-          state.map((c) => (c._id === card._id ? newCard : c))
+          state.map((c) => (c._id === card._id ? newCard.data : c))
         );
       })
       .catch((err) => {
@@ -122,7 +123,7 @@ function App() {
   function handleUpdateUser({ name, about }) {
     Api.setUserInfo(name, about)
       .then((result) => {
-        setCurrentUser(result);
+        setCurrentUser(result.data);
         closeAllPopups();
       })
       .catch((err) => {
@@ -133,7 +134,7 @@ function App() {
   function handleUpdateAvatar({ avatar }) {
     Api.editAvatar(avatar)
       .then((result) => {
-        setCurrentUser(result);
+        setCurrentUser(result.data);
         closeAllPopups();
       })
       .catch((err) => {
@@ -144,7 +145,7 @@ function App() {
   function handleAddPlaceSubmit({ name, link }) {
     Api.addNewCard(name, link)
       .then((newCard) => {
-        setCards([newCard, ...cards]);
+        setCards([newCard.data, ...cards]);
         closeAllPopups();
       })
       .catch((err) => {
@@ -186,12 +187,9 @@ function App() {
   function handleLogin(email, password) {
     Auth.login(email, password)
       .then((res) => {
-        if (res.token) {
-          localStorage.setItem("jwt", res.token);
-          setLoggedIn(true);
-          history.push("/");
-          return res;
-        }
+        setLoggedIn(true);
+        history.push("/");
+        return res;
       })
       .catch((error) => {
         setToolTipSrc(smthWrong);
@@ -202,9 +200,15 @@ function App() {
   }
 
   function logOut() {
-    localStorage.removeItem("jwt");
-    history.push("/sign-in");
-    setLoggedIn(false);
+    Auth.logOut()
+    .then((res) => {
+      setLoggedIn(false);
+      history.push("/sign-in");
+      return res;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
   }
 
   return (

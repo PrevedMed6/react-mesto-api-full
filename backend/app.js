@@ -1,20 +1,30 @@
 /* eslint-disable no-console */
 const express = require('express');
+require('dotenv').config();
+const cors = require('cors');
 const mongoose = require('mongoose');
 const { celebrate, Joi, errors } = require('celebrate');
 const cookieParser = require('cookie-parser');
 const users = require('./routes/users');
 const cards = require('./routes/cards');
-const { login, createUser } = require('./controllers/users');
+const { login, createUser, logout } = require('./controllers/users');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 const auth = require('./middlewares/auth');
 const customErrors = require('./middlewares/errors');
 const pageNotFound = require('./middlewares/pageNotFound');
-const dotEnvConsts = require('./utils/DotEnvConsts');
+const { DB_SERVER_URL, FRONT_URL } = process.env;
 
 const { PORT = 3000 } = process.env;
+const corsOptions = {
+  origin: FRONT_URL ?? 'http://localhost:3001',
+  credentials: true,
+  optionsSuccessStatus: 200
+}
 const app = express();
+app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
+app.use(requestLogger);
 app.post(
   '/signin',
   celebrate({
@@ -44,15 +54,17 @@ app.post(
   }),
   createUser,
 );
+app.get('/signout', logout);
 app.use(auth);
 app.use('/', users);
 app.use('/', cards);
 
+app.use(errorLogger);
 app.use(pageNotFound);
 app.use(errors());
 app.use(customErrors);
 
-mongoose.connect(dotEnvConsts.SERVER_URL);
+mongoose.connect(DB_SERVER_URL);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);

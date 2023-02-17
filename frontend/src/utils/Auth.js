@@ -12,7 +12,7 @@ class Auth {
       },
       body: JSON.stringify({ password, email }),
     }).then((response) => {
-      if (response.status === 201) {
+      if (response.status === 200) {
         return response.json();
       }
       return Promise.reject(`Ошибка: ${response.status}`);
@@ -22,6 +22,7 @@ class Auth {
   login(email, password) {
     return fetch(`${this._baseUrl}/signin`, {
       method: "POST",
+      credentials: 'include',
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -35,19 +36,38 @@ class Auth {
     });
   }
 
-  getMe(jwt) {
-    return fetch(`${this._baseUrl}/users/me`, {
+  logOut() {
+    return fetch(`${this._baseUrl}/signout`, {
       method: "GET",
+      credentials: 'include',
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-        Authorization: `Bearer ${jwt}`,
+      },
+    }).then((response) => {
+      if (response.status === 200) {
+        return response.json();
+      }
+      return Promise.reject(`Ошибка: ${response.status}`);
+    });
+  }
+
+  getMe() {
+    return fetch(`${this._baseUrl}/users/me`, {
+      method: "GET",
+      credentials: 'include',
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
       },
     })
       .then((res) => res.json())
       .then((data) => data);
   }
 }
-export default new Auth({
-  baseUrl: "https://auth.nomoreparties.co",
+
+const auth = new Auth({
+  baseUrl: process.env.REACT_APP_SERVER_URL,
 });
+
+export default auth;
