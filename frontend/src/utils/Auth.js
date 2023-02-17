@@ -67,7 +67,7 @@ class Auth {
 }
 
 const auth = new Auth({
-  baseUrl: process.env.REACT_APP_SERVER_URL,
+  baseUrl: process.env.REACT_APP_SERVER_URL??'http://localhost:3000',
 });
 
 export default auth;

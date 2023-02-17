@@ -25,6 +25,11 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
 app.use(requestLogger);
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
 app.post(
   '/signin',
   celebrate({
@@ -64,7 +69,7 @@ app.use(pageNotFound);
 app.use(errors());
 app.use(customErrors);
 
-mongoose.connect(DB_SERVER_URL);
+mongoose.connect(DB_SERVER_URL??'mongodb://localhost:27017/mestodb');
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
