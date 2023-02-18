@@ -4,9 +4,9 @@ module.exports = (req, res, next) => {
   const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
   const requestHeaders = req.headers['access-control-request-headers'];
   const allowedCors = [
-    'https://bigbelka.mesto.nomoredomainsclub.ru/',
-    'http://bigbelka.mesto.nomoredomainsclub.ru/',
-    'http://localhost:3001',
+    'https://bigbelka.mesto.nomoredomainsclub.ru',
+    'http://bigbelka.mesto.nomoredomainsclub.ru',
+    'http://localhost:3000',
   ];
 
   if (allowedCors.includes(origin)) {
