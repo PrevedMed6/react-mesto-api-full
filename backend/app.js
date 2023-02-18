@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 const express = require('express');
 require('dotenv').config();
-const cors = require('cors');
 const mongoose = require('mongoose');
 const { celebrate, Joi, errors } = require('celebrate');
 const cookieParser = require('cookie-parser');
@@ -11,17 +10,13 @@ const { login, createUser, logout } = require('./controllers/users');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const auth = require('./middlewares/auth');
 const customErrors = require('./middlewares/errors');
+const cors = require('./middlewares/cors');
 const pageNotFound = require('./middlewares/pageNotFound');
 const { DB_SERVER_URL, FRONT_URL } = process.env;
 
 const { PORT = 3000 } = process.env;
-const corsOptions = {
-  origin: FRONT_URL ?? 'http://localhost:3001',
-  credentials: true,
-  optionsSuccessStatus: 200
-}
 const app = express();
-app.use(cors(corsOptions));
+app.use(cors);
 app.use(cookieParser());
 app.use(express.json());
 app.use(requestLogger);
